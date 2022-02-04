@@ -1,0 +1,145 @@
+@prefix schema: <http://schema.org/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix person: <http://www.w3.org/ns/person#> .
+@prefix locn: <http://www.w3.org/ns/locn#> .
+@prefix vp: <https://data.vlaanderen.be/ns/persoon#>.
+@prefix va: <https://data.vlaanderen.be/ns/adres#>.
+@prefix : <http://example.org/>.
+@prefix func: <http://www.w3.org/2007/rif-builtin-function#>.
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#>.
+base <http://example.org/>
+
+
+
+
+#assumption: we know the uri of the patient and could state that in our system. Alternatively, we use more complex patterns to identify the pationt.
+#address rule
+{
+?x a person:Person.
+?x a fhir:Patient.
+
+?x     vp:heeftInwonerschap [
+            vp:heeftVerblijfplaats [
+                    vp:verblijfsadres [
+                            va:heeftPostInfo [
+                                va:postcode  ?pc ; # (cfr. locn:poBox)
+                                            ];
+                            va:heeftStraatnaam [
+                                prov:value ?street ;
+                                ];
+                            va:Adresvoorstelling.huisnummer ?no ;
+                            va:heeftGemeentenaam [
+                                prov:value ?place
+                                  ];
+                            va:land ?country;
+                                ]
+                            ]
+                          ] .
+  (?street " " ?no) string:concatenation ?addressline.
+}=>{
+?x fhir:Patient.address [
+    fhir:index "0"^^xsd:integer ;
+    fhir:Address.city [
+        fhir:value ?place
+    ] ;
+    fhir:Address.line [
+        fhir:index "0"^^xsd:integer ;
+        fhir:value ?addressline
+    ] ;
+    fhir:Address.postalCode [
+        fhir:value ?pc
+    ]
+    ].
+}.
+
+#birth date
+{
+?x a person:Person.
+?x a fhir:Patient.
+?x vp:heeftGeboorte [
+      vp:datum ?date
+      ].
+  }=>
+  {
+  ?x fhir:Patient.birthDate [
+      fhir:Element.extension [
+          fhir:index "0"^^xsd:integer ;
+          fhir:Extension.url [
+              fhir:value "http://hl7.org/fhir/StructureDefinition/patient-birthTime"
+          ] ;
+          fhir:Extension.valueDateTime [
+              fhir:value ?date
+          ]
+      ]
+      ].
+
+  }.
+
+  #gender
+  {
+  ?x a person:Person.
+  ?x a fhir:Patient;
+    vp:geslacht  ?value
+
+  }=>{
+  ?x fhir:Patient.gender [
+      fhir:value ?value
+  ] ;
+  }.
+
+  #name
+  {
+  ?x a person:Person.
+  ?x a fhir:Patient.
+  ?x vp:volledigeNaam ?full ;
+  vp:gebruikteVoornaam ?first ;
+  foaf:familyName ?family;
+  person:birthName ?birth .
+  (?full ?first) func:substring-after ?end.
+  (?end ?family) func:substring-before ?second.
+  }
+  =>
+  {
+  ?x fhir:Patient.name [
+      fhir:index "0"^^xsd:integer ;
+      fhir:HumanName.family [
+          fhir:value ?family
+      ] ;
+      fhir:HumanName.given [
+          fhir:index "0"^^xsd:integer ;
+          fhir:value ?first
+      ],
+          [
+          fhir:index "1"^^xsd:integer ;
+          fhir:value ?second
+      ] ;
+      fhir:HumanName.use [
+          fhir:value "official"
+      ]
+  ].
+  }.
+
+  #Phone number
+{
+?x a person:Person.
+?x a fhir:Patient.
+?x  schema:contactPoint [ schema:contactType ?t;
+                        schema:telephone ?number ].
+}=>
+{
+?x     fhir:Patient.telecom [
+        fhir:index "0"^^xsd:integer ;
+        fhir:ContactPoint.rank [
+            fhir:value "1"^^xsd:positiveInteger
+        ] ;
+        fhir:ContactPoint.system [
+            fhir:value ?t
+        ] ;
+        fhir:ContactPoint.value [
+            fhir:value ?number
+        ]
+    ].
+}.

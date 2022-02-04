@@ -1,0 +1,71 @@
+@prefix schema: <http://schema.org/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix person: <http://www.w3.org/ns/person#> .
+@prefix locn: <http://www.w3.org/ns/locn#> .
+@prefix vp: <https://data.vlaanderen.be/ns/persoon#>.
+@prefix va: <https://data.vlaanderen.be/ns/adres#>.
+@prefix : <http://example.org/>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+base <http://example.org/>
+
+# converting FHIR to OSLO would be an issue ..
+# e.g., fhir:Patient.contact: has type employer, insurer, which is not in OSLO
+# fhir:Address.period, fhir:HumanName.use (not completely), fhir:HumanName.period
+
+:pieter a person:Person , schema:Person ;
+    vp:heeftInwonerschap [
+        a vp:Inwonerschap ;
+
+        vp:heeftVerblijfplaats [
+                  a vp:Verblijfplaats ;
+
+            vp:verblijfsadres [
+                a locn:Address, va:Adres , prov:Entity ;
+
+
+                va:heeftPostInfo [
+
+                    va:postcode  "9000" ; # (cfr. locn:poBox)
+
+                ];
+
+                va:heeftStraatnaam [ # (cfr. locn:thoroughfare)
+                    a va:Straatnaam , prov:Entity ;
+                    prov:value "Hoogstaat" ;
+                   va:postnaam "Gent"
+                ];
+
+                               va:Adresvoorstelling.huisnummer 99 ; # (sub-property of locn:locatorDesignator) (domain: locn:Address)
+
+                # va:gemeentenaam ".." # (sub-property of loc:postName) (domain: locn:Address)
+                va:heeftGemeentenaam [
+                    a va:Gemeentenaam , prov:Entity ; # (cfr.) loc:postName
+                    prov:value "Gent" # (?)
+                ];
+
+                # loc:adminUnitL2 ".." ; (not found in va)
+                va:land "Belgie"; # (sub-property of) locn:adminUnitL1 (domain: locn:Address)
+            ]
+            ]
+        ] ;
+
+
+     vp:heeftGeboorte [ # fhir:Patient.birthDate
+
+            vp:datum "1974-12-25T14:35:45-05:00"^^xsd:dateTime ; # (sub-property of <http://purl.org/vocab/bio/0.1/date>)
+            vp:plaats <https://data.vlaanderen.be/doc/gemeentenaam/44011>
+        ] ;
+        vp:geslacht "male" ;
+        vp:volledigeNaam "Pieter Willem Smit" ;
+
+        vp:gebruikteVoornaam "Pieter" ;
+        foaf:familyName "Smit" ;
+        person:birthName "Doe" ;
+
+        schema:contactPoint [ schema:contactType "phone";
+                              schema:telephone "0032041234567" ].
+
+
+
+
+<https://data.vlaanderen.be/doc/gemeentenaam/44011>    va:gemeentenaam "Deinze".

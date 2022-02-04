@@ -1,0 +1,118 @@
+@prefix schema: <http://schema.org/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix person: <http://www.w3.org/ns/person#> .
+@prefix locn: <http://www.w3.org/ns/locn#> .
+@prefix vp: <https://data.vlaanderen.be/ns/persoon#>
+@prefix va: <https://data.vlaanderen.be/ns/adres#>
+@prefix : <http://example.org/>
+base <http://example.org/>
+
+# converting FHIR to OSLO would be an issue ..
+# e.g., fhir:Patient.contact: has type employer, insurer, which is not in OSLO
+# fhir:Address.period, fhir:HumanName.use (not completely), fhir:HumanName.period
+
+:burger1 a person:Person , schema:Person ;
+    vp:heeftInwonerschap [
+        a vp:Inwonerschap ;
+
+        # fhir:Patient.address
+        vp:heeftVerblijfplaats [
+
+            # fhir:Address.use (home/temp), fhir:Address.type (postal/physical)
+            # would map to a subtype of vp:Verblijfplaats but there are no ideal matches (only Domicilie?)
+
+            a vp:Verblijfplaats ;
+
+            # (in general, using the object-property versions allows inserting provenance data
+            # as they have a prov:Entity as range)
+            vp:verblijfsadres [
+                a locn:Address, va:Adres , prov:Entity ;
+
+                # not a perfect match with fhir:Address.period - fhir:Period.start
+                # since that pertains to when the address was/is in use
+                # perhaps use Adres.status instead (points to skos:Concept)?
+                prov:generatedAtTime ".." ;
+                va:Adres.status ".." ; # ?
+
+                locn:addressId ".." ;
+
+                va:isVerrijktMet [
+                    a va:Adresuitbreiding ;
+                    va:volledigAdres ".." # (cfr. locn:fullAddress)
+                ]
+
+                va:heeftPostInfo [
+                    a va:Postinfo , prov:Entity ;
+                    va:postcode ".." ; # (cfr. locn:poBox)
+                    va:postnaam ".." ; # ??
+                ]
+
+                va:heeftStraatnaam [ # (cfr. locn:thoroughfare)
+                    a va:Straatnaam , prov:Entity ;
+                    prov:value ".." # (?)
+                ];
+
+                va:Adresvoorstelling.busnummer ".." ; # (sub-property of locn:locatorDesignator) (domain: locn:Address)
+                va:Adresvoorstelling.huisnummer ".." ; # (sub-property of locn:locatorDesignator) (domain: locn:Address)
+
+                # va:gemeentenaam ".." # (sub-property of loc:postName) (domain: locn:Address)
+                va:heeftGemeentenaam [
+                    a va:Gemeentenaam , prov:Entity ; # (cfr.) loc:postName
+                    prov:value ".." # (?)
+                ]
+
+                # loc:adminUnitL2 ".." ; (not found in va)
+                va:land ".." ; # (sub-property of) locn:adminUnitL1 (domain: locn:Address)
+            ]
+        ] ;
+
+        vp:heeftGeboorte [ # fhir:Patient.birthDate
+            a vp:Geboorte , <http://purl.org/vocab/bio/0.1/Birth> , vp:Persoonsgebeurtenis ;
+
+            vp:datum ".." ; # (sub-property of <http://purl.org/vocab/bio/0.1/date>)
+            vp:plaats [ # (sub-property of <http://purl.org/vocab/bio/0.1/place>) (or, vp:land, apparently ..)
+                a dcterms:Location ;
+                # ..
+            ]
+        ] ;
+
+        vp:geslacht <> ; # fhir:Patient.gender (range = skos:Concept)
+        vp:heeftOverlijden [ # fhir:Patient.deceasedBoolean
+            # .. convert occurrence of heeftOverlijden to boolean
+        ]
+
+        # fhir:Patient.identifier: assume this would be generated internally
+        # fhir:Patient.managingOrganization: idem
+
+        # fhir:Patient.name
+        # (fhir:HumanName.use = official (?))
+
+        vp:volledigeNaam ".." ; # (sub-property of foaf:name)
+        vp:alternatieveNaam ".." ; # (sub-property of foaf:name)
+        # fhir:HumanName.given (unfortunately, no way to indicate multiple names as in the FHIR file)
+        # (of course, we could use a ttl list which is ordered by default)
+        vp:gebruikteVoornaam ".." ; # (sub-property of foaf:givenName)
+        # fhir:HumanName.family
+        foaf:familyName ".." ; # (mentioned in persoon.ttl)
+
+        # fhir:HumanName.use = maiden (?)
+        person:birthName ".." ; # (mentioned in persoon.ttl)
+
+        # no support for fhir:HumanName.period
+
+        # no support for indicating types of telephones (e.g., work, mobile)
+        schema:telephone ".." ; # (mentioned in generiek.ttl)
+    ] .
+
+# fhir:Patient.contact
+
+# e.g., use PersoonsRelatie to indicate type of contact (i.e., fhir:Patient.contact.relationship)
+# (persoon.ttl mentions ContactPoint but that seems to imply something else)
+:burger1 person:heeftPersoonsrelatie [
+    # or some other subclass; would be converted to Next-of-kin
+    # (https://terminology.hl7.org/3.0.0/CodeSystem-v2-0131.html)
+    a vp:Huwelijk ;
+    person:isRelatieMet :burger2
+] .
+
+:burger2 a person:Person . # ..
