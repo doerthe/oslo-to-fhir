@@ -10,6 +10,7 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix string: <http://www.w3.org/2000/10/swap/string#>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
 base <http://example.org/>
 
 
