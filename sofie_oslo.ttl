@@ -9,11 +9,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 base <http://example.org/>
 
-# converting FHIR to OSLO would be an issue ..
-# e.g., fhir:Patient.contact: has type employer, insurer, which is not in OSLO
-# fhir:Address.period, fhir:HumanName.use (not completely), fhir:HumanName.period
-
-<https://raw.githubusercontent.com/doerthe/oslo-to-fhir/main/pieter_oslo.ttl> a person:Person , schema:Person ;
+<https://raw.githubusercontent.com/doerthe/oslo-to-fhir/main/sofie_oslo.ttl> a person:Person , schema:Person ;
     vp:heeftInwonerschap [
         a vp:Inwonerschap ;
 
@@ -53,28 +49,27 @@ base <http://example.org/>
 
      vp:heeftGeboorte [ # fhir:Patient.birthDate
 
-            vp:datum "1974-12-25T14:35:45-05:00"^^xsd:dateTime ; # (sub-property of <http://purl.org/vocab/bio/0.1/date>)
-            vp:plaats <https://data.vlaanderen.be/doc/gemeentenaam/44011>
+            vp:datum "1977-08-13T19:38:55-05:00"^^xsd:dateTime ; # (sub-property of <http://purl.org/vocab/bio/0.1/date>)
+            vp:plaats <https://data.vlaanderen.be/doc/gemeentenaam/44013>
         ] ;
-        vp:geslacht "male" ;
-        vp:volledigeNaam "Pieter Willem Smit" ;
+        vp:geslacht "female" ;
+        vp:volledigeNaam "Sofie Smit" ;
 
-        vp:gebruikteVoornaam "Pieter" ;
+        vp:gebruikteVoornaam "Sofie" ;
         foaf:familyName "Smit" ;
-        person:birthName "Doe" ;
 
-        schema:contactPoint [ schema:contactType "phone";
-                              schema:telephone "0032041234567" ];
+        schema:contactPoint [ schema:contactType "mobilephone";
+                              schema:telephone "00320499999999" ];
 
 
               person:heeftPersoonsrelatie [
                                   a vp:Huwelijk ;
-                                  person:isRelatieMet <https://raw.githubusercontent.com/doerthe/oslo-to-fhir/main/sofie_oslo.ttl>
+                                  person:isRelatieMet <https://raw.githubusercontent.com/doerthe/oslo-to-fhir/main/pieter_oslo.ttl>
                               ] .
 
-<https://raw.githubusercontent.com/doerthe/oslo-to-fhir/main/sofie_oslo.ttl>  a person:Person .
+                              <https://raw.githubusercontent.com/doerthe/oslo-to-fhir/main/pieter_oslo.ttl> a person:Person .
 
 
 
 
-<https://data.vlaanderen.be/doc/gemeentenaam/44011>    va:gemeentenaam "Deinze".
+<https://data.vlaanderen.be/doc/gemeentenaam/44011>    va:gemeentenaam "Destelbergen".
