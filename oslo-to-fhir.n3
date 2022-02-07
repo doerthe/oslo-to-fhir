@@ -162,7 +162,7 @@ base <http://example.org/>
     vp:geslacht  ?sg.
   #name
   ?y vp:gebruikteVoornaam ?first ;
-     foaf:familyName ?family;
+     foaf:familyName ?family.
   #telephone
   ?y schema:contactPoint [ schema:contactType ?t;
                           schema:telephone ?number ].
@@ -190,5 +190,5 @@ fhir:Patient.contact.telecom [
         fhir:value ?number
     ]
 ]
-]
+
 }.
