@@ -11,6 +11,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix string: <http://www.w3.org/2000/10/swap/string#>.
 @prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
 base <http://example.org/>
 
 
@@ -143,4 +144,51 @@ base <http://example.org/>
             fhir:value ?number
         ]
     ].
+}.
+
+#spouse as emergency contact
+{
+?x a person:Person.
+?x a fhir:Patient.
+# ?x is married to ?y
+?x   person:heeftPersoonsrelatie [
+                                  a vp:Huwelijk;
+                                  person:isRelatieMet ?y
+                                  ].
+?y log:semantics ?contant.
+?content log:includes {
+  #gender
+  ?y a person:Person;
+    vp:geslacht  ?sg.
+  #name
+  ?y vp:gebruikteVoornaam ?first ;
+     foaf:familyName ?family;
+  #telephone
+  ?y schema:contactPoint [ schema:contactType ?t;
+                          schema:telephone ?number ].
+
+  }.
+}=>
+{
+?x fhir:Patient.contact.gender [ ?sg
+] ;
+fhir:Patient.contact.name [
+    fhir:HumanName.family [
+        fhir:value ?family
+    ] ;
+    fhir:HumanName.given [
+        fhir:index "0"^^xsd:integer ;
+        fhir:value ?first
+    ]
+] ;
+fhir:Patient.contact.telecom [
+    fhir:index "0"^^xsd:integer ;
+    fhir:ContactPoint.system [
+        fhir:value ?t
+    ] ;
+    fhir:ContactPoint.value [
+        fhir:value ?number
+    ]
+]
+]
 }.
