@@ -13,7 +13,7 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#>.
 @prefix foaf: <http://xmlns.com/foaf/0.1/>.
 
-<https://raw.githubusercontent.com/doerthe/oslo-to-fhir/main/sofie_oslo.ttl>
+<https://raw.githubusercontent.com/doerthe/oslo-to-fhir/main/pieter_oslo.ttl>
     fhir:Patient.address [
                     fhir:Address.city [
                             fhir:value "Gent";
