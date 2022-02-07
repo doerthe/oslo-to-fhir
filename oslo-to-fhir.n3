@@ -170,7 +170,7 @@ base <http://example.org/>
   }.
 }=>
 {
-?x fhir:Patient.contact.gender [ ?sg
+?x fhir:Patient.contact.gender [ vp:geslacht ?sg
 ] ;
 fhir:Patient.contact.name [
     fhir:HumanName.family [
