@@ -155,7 +155,7 @@ base <http://example.org/>
                                   a vp:Huwelijk;
                                   person:isRelatieMet ?y
                                   ].
-?y log:semantics ?contant.
+?y log:semantics ?content.
 ?content log:includes {
   #gender
   ?y a person:Person;
